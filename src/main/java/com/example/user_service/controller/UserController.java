@@ -53,6 +53,11 @@ public class UserController {
 	public List<UserEntity> getAllUsers() {
 		return userService.getAllUsers();
 	}
+	
+	@GetMapping("/{userId}")
+	public Optional<UserEntity> getAuserById(@PathVariable int userId){
+		return userService.getAuserById(userId);
+	}
 
 	@GetMapping("/validate/token")
 	public boolean validateToken(@RequestParam String token) {

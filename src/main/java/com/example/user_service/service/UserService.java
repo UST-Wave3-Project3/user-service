@@ -47,7 +47,9 @@ public class UserService {
         return user;
     }
 
-
+    public Optional<UserEntity> getAuserById(int userId){
+    	return userInfoRepository.findById(userId);
+    }
 	
 	public List<UserEntity> getAllUsers(){
 		return userInfoRepository.findAll();
