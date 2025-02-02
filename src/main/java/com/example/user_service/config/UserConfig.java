@@ -1,3 +1,4 @@
+
 package com.example.user_service.config;
 
 import org.springframework.context.annotation.Bean;
@@ -6,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.example.user_service.service.CustomUserDetailsService;
 
 @Configuration
-@EnableMethodSecurity
+
 public class UserConfig {
 	
 	@Bean
@@ -24,27 +24,14 @@ public class UserConfig {
 		return new CustomUserDetailsService();
 	}
 
-//	@Bean
-//	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//		http
-//		.csrf(csrf -> csrf.disable())
-//		.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-//		.headers((headers) -> headers.frameOptions((frame) -> frame.sameOrigin()));
-//		return http.build();
-//	}
-	
 	@Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-//                .requestMatchers().permitAll() // Public endpoints
-//                .requestMatchers("/api/users/**").hasAuthority("ADMIN")
-                .anyRequest().permitAll()
-            )
-            .headers((headers) -> headers.frameOptions((frame)->frame.sameOrigin())); // Allow same-origin frame options
-        return http.build();
-    }
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http
+			.csrf(csrf -> csrf.disable())
+			.authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+			.headers((headers) -> headers.frameOptions((frame) -> frame.sameOrigin()));
+		return http.build();
+	}
 
 	@Bean
 	public PasswordEncoder passwordEncoder() {

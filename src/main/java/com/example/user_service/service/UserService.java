@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.user_service.client.RoleClient;
+import com.example.user_service.dto.UserRoleCreateDto;
+import com.example.user_service.dto.UserRoleDto;
 import com.example.user_service.repository.UserRepository;
 import com.example.user_service.repository.entity.UserEntity;
 
@@ -22,45 +25,65 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
     
-    public UserEntity registerAdmin(UserEntity newAdmin) {
-        newAdmin.setUserPassword(passwordEncoder.encode(newAdmin.getUserPassword()));
-        return userInfoRepository.saveAndFlush(newAdmin);
+    @Autowired
+    private RoleClient roleClient;
+    
+    
+    public UserRoleDto register(UserRoleDto user) {
+        user.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
+        UserEntity newUser = userInfoRepository.saveAndFlush(
+            new UserEntity(0, user.getUserEmail(), user.getUserPassword(), user.getUserFirstName(), user.getUserLastName(), user.getUserPhoneNo())
+        );
+
+        if (user.getAllRolesId() == null || user.getAllRolesId().isEmpty()) {
+            user.setAllRolesId(List.of(1));  // Default role ID
+        }
+
+        for (int roleId : user.getAllRolesId()) {
+            System.out.println("Assigning role ID: " + roleId + " to user ID: " + newUser.getUserId());
+            roleClient.createUserRole(new UserRoleCreateDto(0, newUser.getUserId(), roleId));
+        }
+
+        return user;
+    }
+
+    public Optional<UserEntity> getAuserById(int userId){
+    	return userInfoRepository.findById(userId);
     }
 	
 	public List<UserEntity> getAllUsers(){
 		return userInfoRepository.findAll();
 	}
 	
-	public Optional<UserEntity> getAUserById(int uId){
-		return userInfoRepository.findById(uId);
+	public String generateToken(String name, List<String> allRoles) {
+		return jwtService.generateToken(name, allRoles);
 	}
-	
-	public Optional<UserEntity> getUserByEmail(String email) {
-        return userInfoRepository.findByUserEmail(email);
-    }
-	
-	public UserEntity addUser(UserEntity newUser) {
-		newUser.setUserPassword(passwordEncoder.encode(newUser.getUserPassword()));
-		return userInfoRepository.saveAndFlush(newUser);
-	}
-	
-	public UserEntity updateUser(UserEntity editUser) {
-		editUser.setUserPassword(passwordEncoder.encode(editUser.getUserPassword()));
-		return userInfoRepository.save(editUser);
-	}
-	
-	public void deleteUser(int uId) {
-		userInfoRepository.deleteById(uId);
-	}
-	
-	public String generateToken(String email) {
-		return jwtService.generateToken(email);
-	}
-	
-	public boolean verifyToken(String token) {
-        jwtService.validateToken(token);
-        return true;
-    }
 
+	public boolean verifyToken(String token) {
+		jwtService.validateToken(token);
+		return true;
+	}
 	
+//	public Optional<UserEntity> getAUserById(int uId){
+//		return userInfoRepository.findById(uId);
+//	}
+//	
+//	public Optional<UserEntity> getUserByEmail(String email) {
+//        return userInfoRepository.findByUserEmail(email);
+//    }
+//	
+//	public UserEntity addUser(UserEntity newUser) {
+//		newUser.setUserPassword(passwordEncoder.encode(newUser.getUserPassword()));
+//		return userInfoRepository.saveAndFlush(newUser);
+//	}
+//	
+//	public UserEntity updateUser(UserEntity editUser) {
+//		editUser.setUserPassword(passwordEncoder.encode(editUser.getUserPassword()));
+//		return userInfoRepository.save(editUser);
+//	}
+//	
+//	public void deleteUser(int uId) {
+//		userInfoRepository.deleteById(uId);
+//	}
+		
 }

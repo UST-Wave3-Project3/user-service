@@ -38,7 +38,5 @@ public class UserEntity {
     
 	@Column(name="user_phoneno")
     private String userPhoneNo;
-	
-	private int roleId;
 
 }
